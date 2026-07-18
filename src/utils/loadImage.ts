@@ -1,4 +1,5 @@
 import type { ComposerImage } from "../types";
+import { DEFAULT_CROP } from "../types";
 import { createId } from "./id";
 
 /** Decodes an image file into a ComposerImage with a default (unset) transform. */
@@ -14,6 +15,7 @@ export async function loadImageFile(file: File): Promise<ComposerImage | null> {
       naturalHeight: bitmap.height,
       transform: { x: 0, y: 0, width: 0, height: 0, rotation: 0 },
       zIndex: 0,
+      crop: { ...DEFAULT_CROP },
     };
   } catch (err) {
     console.warn(`Could not decode "${file.name}" as an image`, err);

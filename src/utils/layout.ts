@@ -59,6 +59,7 @@ export function scatterTransform(
   canvasHeight: number,
   index: number,
   total: number,
+  tiltEnabled: boolean = false,
 ): Transform {
   const targetLong = Math.min(canvasWidth, canvasHeight) * (total > 6 ? 0.32 : 0.42);
   const aspect = image.naturalWidth / image.naturalHeight;
@@ -84,7 +85,7 @@ export function scatterTransform(
 
   const x = clamp(baseX + rand * cellW * 0.25, marginX, canvasWidth - marginX);
   const y = clamp(baseY + rand2 * cellH * 0.25, marginY, canvasHeight - marginY);
-  const rotation = rand * 14;
+  const rotation = tiltEnabled ? rand * 14 : 0;
 
   return { x, y, width, height, rotation };
 }

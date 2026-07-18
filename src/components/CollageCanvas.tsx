@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import type { CanvasSettings, ComposerImage, GridSettings, LayoutMode, Transform } from "../types";
 import { drawComposition } from "../utils/canvasDraw";
 import { isInsideTransform, isNearResizeHandle } from "../utils/hitTest";
+import { computeGridCells } from "../utils/layout";
 
 interface CollageCanvasProps {
   images: ComposerImage[];
@@ -61,8 +62,21 @@ export function CollageCanvas({
   }
 
   function handlePointerDown(e: React.PointerEvent<HTMLCanvasElement>) {
-    if (layoutMode !== "freeform") return;
     const point = canvasPointFromEvent(e);
+
+    if (layoutMode === "grid") {
+      const cells = computeGridCells(images.length, settings.width, settings.height, grid.gap, grid.columns);
+      const hitIndex = cells.findIndex(
+        (cell) =>
+          point.x >= cell.x &&
+          point.x <= cell.x + cell.width &&
+          point.y >= cell.y &&
+          point.y <= cell.y + cell.height,
+      );
+      onSelect(hitIndex >= 0 ? images[hitIndex].id : null);
+      return;
+    }
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
@@ -155,7 +169,7 @@ export function CollageCanvas({
       ref={canvasRef}
       width={settings.width}
       height={settings.height}
-      className={`collage-canvas ${layoutMode === "freeform" ? "collage-canvas--interactive" : ""}`}
+      className="collage-canvas collage-canvas--interactive"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}

@@ -24,6 +24,17 @@ export interface Transform {
   rotation: number;
 }
 
+export interface CropState {
+  /** how far zoomed in past the base "fill the frame" size, 1 = no extra crop */
+  zoom: number;
+  /** pan offset as a fraction of the available range, -1..1, 0 = centered */
+  offsetX: number;
+  /** pan offset as a fraction of the available range, -1..1, 0 = centered */
+  offsetY: number;
+}
+
+export const DEFAULT_CROP: CropState = { zoom: 1, offsetX: 0, offsetY: 0 };
+
 export interface ComposerImage {
   id: string;
   file: File;
@@ -35,6 +46,8 @@ export interface ComposerImage {
   transform: Transform;
   /** stacking order in freeform mode, higher draws on top */
   zIndex: number;
+  /** which part of the photo is visible within its frame */
+  crop: CropState;
 }
 
 export interface CanvasSettings {

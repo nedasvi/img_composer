@@ -1,5 +1,8 @@
 import { useRef, useState } from "react";
 import type { ComposerImage } from "../types";
+import { useLanguage } from "../i18n/LanguageContext";
+
+const THUMB_SIZE = 64;
 
 interface ImageListProps {
   images: ComposerImage[];
@@ -20,6 +23,7 @@ export function ImageList({
   onReorder,
   onClearAll,
 }: ImageListProps) {
+  const { t } = useLanguage();
   const [dragOverId, setDragOverId] = useState<string | null>(null);
   const draggingId = useRef<string | null>(null);
 
@@ -28,12 +32,12 @@ export function ImageList({
   return (
     <div className="panel-section">
       <div className="panel-section__header">
-        <h3>Images ({images.length})</h3>
+        <h3>{t.imagesHeading(images.length)}</h3>
         <button type="button" className="link-button" onClick={onClearAll}>
-          Clear all
+          {t.imagesClearAll}
         </button>
       </div>
-      {reorderable && <p className="field-hint">Drag thumbnails to reorder the grid.</p>}
+      {reorderable && <p className="field-hint">{t.imagesReorderHint}</p>}
       <ul className="image-list">
         {images.map((img) => (
           <li
@@ -67,7 +71,7 @@ export function ImageList({
             <button
               type="button"
               className="image-list__remove"
-              aria-label={`Remove ${img.name}`}
+              aria-label={t.imagesRemove(img.name)}
               onClick={(e) => {
                 e.stopPropagation();
                 onRemove(img.id);
@@ -95,7 +99,7 @@ function ImageThumb({ image }: { image: ComposerImage }) {
         if (el && !drawn.current) {
           const ctx = el.getContext("2d");
           if (ctx) {
-            const size = 48;
+            const size = THUMB_SIZE;
             el.width = size;
             el.height = size;
             const scale = Math.max(size / image.naturalWidth, size / image.naturalHeight);
@@ -107,8 +111,8 @@ function ImageThumb({ image }: { image: ComposerImage }) {
         }
       }}
       className="image-list__thumb"
-      width={48}
-      height={48}
+      width={THUMB_SIZE}
+      height={THUMB_SIZE}
     />
   );
 }

@@ -1,5 +1,5 @@
 import type { CanvasAspect, CanvasSettings } from "../types";
-import { ASPECT_LABELS } from "../utils/aspect";
+import { useLanguage } from "../i18n/LanguageContext";
 
 interface CanvasSettingsPanelProps {
   settings: CanvasSettings;
@@ -24,29 +24,38 @@ export function CanvasSettingsPanel({
   onChange,
   onAspectChange,
 }: CanvasSettingsPanelProps) {
+  const { t } = useLanguage();
+
+  const aspectLabels: Record<CanvasAspect, string> = {
+    square: t.aspectSquare,
+    "4:3": t.aspect4_3,
+    "3:2": t.aspect3_2,
+    "16:9": t.aspect16_9,
+    "9:16": t.aspect9_16,
+    "match-first": t.aspectMatchFirst,
+    custom: t.aspectCustom,
+  };
+
   return (
     <div className="panel-section">
-      <h3>Canvas</h3>
+      <h3>{t.canvasHeading}</h3>
       <label className="field">
-        <span>Aspect ratio</span>
+        <span>{t.canvasAspectLabel}</span>
         <select
           value={settings.aspect}
           onChange={(e) => onAspectChange(e.target.value as CanvasAspect)}
         >
           {ASPECT_OPTIONS.map((a) => (
             <option key={a} value={a} disabled={a === "match-first" && !hasImages}>
-              {ASPECT_LABELS[a]}
+              {aspectLabels[a]}
             </option>
           ))}
         </select>
       </label>
-      <p className="field-hint">
-        “Match first image” sizes the canvas to the aspect ratio &amp; resolution of the first
-        image you uploaded, so everything else lines up against it.
-      </p>
+      <p className="field-hint">{t.canvasAspectHint}</p>
       <div className="field-row">
         <label className="field">
-          <span>Width (px)</span>
+          <span>{t.canvasWidthLabel}</span>
           <input
             type="number"
             min={64}
@@ -59,7 +68,7 @@ export function CanvasSettingsPanel({
           />
         </label>
         <label className="field">
-          <span>Height (px)</span>
+          <span>{t.canvasHeightLabel}</span>
           <input
             type="number"
             min={64}
@@ -73,7 +82,7 @@ export function CanvasSettingsPanel({
         </label>
       </div>
       <label className="field field--inline">
-        <span>Transparent background</span>
+        <span>{t.canvasTransparentLabel}</span>
         <input
           type="checkbox"
           checked={settings.transparentBackground}
@@ -82,7 +91,7 @@ export function CanvasSettingsPanel({
       </label>
       {!settings.transparentBackground && (
         <label className="field field--inline">
-          <span>Background color</span>
+          <span>{t.canvasBackgroundColorLabel}</span>
           <input
             type="color"
             value={settings.backgroundColor}

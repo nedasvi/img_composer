@@ -8,16 +8,6 @@ export const ASPECT_RATIOS: Record<Exclude<CanvasAspect, "match-first" | "custom
   "9:16": 9 / 16,
 };
 
-export const ASPECT_LABELS: Record<CanvasAspect, string> = {
-  square: "Square (1:1)",
-  "4:3": "Standard (4:3)",
-  "3:2": "Photo (3:2)",
-  "16:9": "Widescreen (16:9)",
-  "9:16": "Portrait (9:16)",
-  "match-first": "Match first image",
-  custom: "Custom",
-};
-
 const DEFAULT_LONG_EDGE = 1600;
 
 /** Computes concrete canvas pixel dimensions for a given aspect setting. */

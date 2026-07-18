@@ -1,4 +1,5 @@
 import { useRef, useState, type DragEvent } from "react";
+import { useLanguage } from "../i18n/LanguageContext";
 
 interface UploadZoneProps {
   onFiles: (files: File[]) => void;
@@ -6,6 +7,7 @@ interface UploadZoneProps {
 }
 
 export function UploadZone({ onFiles, compact }: UploadZoneProps) {
+  const { t } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
 
@@ -47,14 +49,12 @@ export function UploadZone({ onFiles, compact }: UploadZoneProps) {
         }}
       />
       {compact ? (
-        <span>+ Add more images</span>
+        <span>{t.uploadCompact}</span>
       ) : (
         <>
           <div className="upload-zone__icon">🖼️</div>
-          <p className="upload-zone__title">Drop images here</p>
-          <p className="upload-zone__hint">
-            or click to browse — JPG, PNG, WebP, GIF, BMP, AVIF, SVG. Upload as many as you like.
-          </p>
+          <p className="upload-zone__title">{t.uploadTitle}</p>
+          <p className="upload-zone__hint">{t.uploadHint}</p>
         </>
       )}
     </div>

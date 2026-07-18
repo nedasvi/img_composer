@@ -7,7 +7,18 @@ import { LayoutPanel } from "./components/LayoutPanel";
 import { SelectedImagePanel } from "./components/SelectedImagePanel";
 import { ExportPanel } from "./components/ExportPanel";
 import { CollageCanvas } from "./components/CollageCanvas";
-import type { CanvasAspect, CanvasSettings, ComposerImage, GridSettings, LayoutMode, Transform } from "./types";
+import { LanguageSwitcher } from "./components/LanguageSwitcher";
+import { useLanguage } from "./i18n/LanguageContext";
+import {
+  DEFAULT_CROP,
+  type CanvasAspect,
+  type CanvasSettings,
+  type ComposerImage,
+  type CropState,
+  type GridSettings,
+  type LayoutMode,
+  type Transform,
+} from "./types";
 import { loadImageFiles } from "./utils/loadImage";
 import { scatterTransform } from "./utils/layout";
 import { dimensionsForAspect } from "./utils/aspect";
@@ -24,10 +35,12 @@ const DEFAULT_CANVAS: CanvasSettings = {
 const DEFAULT_GRID: GridSettings = { fitMode: "cover", gap: 16, columns: "auto" };
 
 function App() {
+  const { t } = useLanguage();
   const [images, setImages] = useState<ComposerImage[]>([]);
   const [layoutMode, setLayoutMode] = useState<LayoutMode>("grid");
   const [canvasSettings, setCanvasSettings] = useState<CanvasSettings>(DEFAULT_CANVAS);
   const [gridSettings, setGridSettings] = useState<GridSettings>(DEFAULT_GRID);
+  const [tiltEnabled, setTiltEnabled] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [failedUploads, setFailedUploads] = useState<string[]>([]);
 
@@ -60,6 +73,7 @@ function App() {
             nextSettings.height,
             prevImages.length + idx,
             combined.length,
+            tiltEnabled,
           );
           img.zIndex = maxZ + idx + 1;
         });
@@ -67,7 +81,7 @@ function App() {
         return combined;
       });
     },
-    [canvasSettings],
+    [canvasSettings, tiltEnabled],
   );
 
   const removeImage = useCallback((id: string) => {
@@ -109,6 +123,16 @@ function App() {
     );
   }, []);
 
+  const patchCrop = useCallback((id: string, patch: Partial<CropState>) => {
+    setImages((prev) =>
+      prev.map((i) => (i.id === id ? { ...i, crop: { ...i.crop, ...patch } } : i)),
+    );
+  }, []);
+
+  const resetCrop = useCallback((id: string) => {
+    setImages((prev) => prev.map((i) => (i.id === id ? { ...i, crop: { ...DEFAULT_CROP } } : i)));
+  }, []);
+
   const bringToFront = useCallback((id: string) => {
     setImages((prev) => {
       const maxZ = prev.reduce((m, i) => Math.max(m, i.zIndex), 0);
@@ -135,10 +159,17 @@ function App() {
     setImages((prev) =>
       prev.map((img, idx) => ({
         ...img,
-        transform: scatterTransform(img, canvasSettings.width, canvasSettings.height, idx, prev.length),
+        transform: scatterTransform(
+          img,
+          canvasSettings.width,
+          canvasSettings.height,
+          idx,
+          prev.length,
+          tiltEnabled,
+        ),
       })),
     );
-  }, [canvasSettings.width, canvasSettings.height]);
+  }, [canvasSettings.width, canvasSettings.height, tiltEnabled]);
 
   const handleAspectChange = useCallback(
     (aspect: CanvasAspect) => {
@@ -205,22 +236,23 @@ function App() {
   );
 
   const hasImages = images.length > 0;
+  const cropDisabled = layoutMode === "grid" && gridSettings.fitMode !== "cover";
 
   return (
     <div className="app">
       <header className="app__header">
-        <h1>Collage Composer</h1>
-        <p>Upload any number of images, arrange them into one canvas, and export the result.</p>
+        <div className="app__header-text">
+          <h1>{t.appTitle}</h1>
+          <p>{t.appSubtitle}</p>
+        </div>
+        <LanguageSwitcher />
       </header>
 
       {failedUploads.length > 0 && (
         <div className="banner banner--warning" role="alert">
-          <span>
-            {failedUploads.length} file{failedUploads.length > 1 ? "s" : ""} couldn't be loaded as
-            images and were skipped.
-          </span>
+          <span>{t.bannerFailedFiles(failedUploads.length)}</span>
           <button type="button" onClick={() => setFailedUploads([])}>
-            Dismiss
+            {t.bannerDismiss}
           </button>
         </div>
       )}
@@ -269,14 +301,20 @@ function App() {
             <LayoutPanel
               layoutMode={layoutMode}
               grid={gridSettings}
+              tiltEnabled={tiltEnabled}
               onLayoutModeChange={setLayoutMode}
               onGridChange={setGridSettings}
+              onTiltChange={setTiltEnabled}
               onRescatter={rescatter}
             />
-            {layoutMode === "freeform" && selectedImage && (
+            {selectedImage && (
               <SelectedImagePanel
                 image={selectedImage}
-                onChange={patchTransform}
+                layoutMode={layoutMode}
+                cropDisabled={cropDisabled}
+                onTransformChange={patchTransform}
+                onCropChange={patchCrop}
+                onCropReset={resetCrop}
                 onBringToFront={bringToFront}
                 onSendToBack={sendToBack}
                 onRemove={removeImage}

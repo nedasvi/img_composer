@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { ExportFormat } from "../utils/exportCanvas";
+import { useLanguage } from "../i18n/LanguageContext";
 
 interface ExportPanelProps {
   disabled: boolean;
@@ -9,6 +10,7 @@ interface ExportPanelProps {
 }
 
 export function ExportPanel({ disabled, width, height, onExport }: ExportPanelProps) {
+  const { t } = useLanguage();
   const [format, setFormat] = useState<ExportFormat>("png");
   const [quality, setQuality] = useState(0.92);
   const [scale, setScale] = useState(1);
@@ -19,18 +21,18 @@ export function ExportPanel({ disabled, width, height, onExport }: ExportPanelPr
 
   return (
     <div className="panel-section panel-section--export">
-      <h3>Export</h3>
+      <h3>{t.exportHeading}</h3>
       <label className="field">
-        <span>Format</span>
+        <span>{t.exportFormatLabel}</span>
         <select value={format} onChange={(e) => setFormat(e.target.value as ExportFormat)}>
-          <option value="png">PNG (lossless, supports transparency)</option>
-          <option value="jpeg">JPEG (smaller file size)</option>
-          <option value="webp">WebP (smaller, supports transparency)</option>
+          <option value="png">{t.exportFormatPng}</option>
+          <option value="jpeg">{t.exportFormatJpeg}</option>
+          <option value="webp">{t.exportFormatWebp}</option>
         </select>
       </label>
       {format !== "png" && (
         <label className="field">
-          <span>Quality: {Math.round(quality * 100)}%</span>
+          <span>{t.exportQualityLabel(Math.round(quality * 100))}</span>
           <input
             type="range"
             min={0.4}
@@ -42,12 +44,12 @@ export function ExportPanel({ disabled, width, height, onExport }: ExportPanelPr
         </label>
       )}
       <label className="field">
-        <span>Resolution: {outW}×{outH}px</span>
+        <span>{t.exportResolutionLabel(outW, outH)}</span>
         <select value={scale} onChange={(e) => setScale(Number(e.target.value))}>
-          <option value={0.5}>Half (0.5×)</option>
-          <option value={1}>Canvas size (1×)</option>
-          <option value={2}>High-res (2×)</option>
-          <option value={3}>Max (3×)</option>
+          <option value={0.5}>{t.exportResHalf}</option>
+          <option value={1}>{t.exportResCanvas}</option>
+          <option value={2}>{t.exportResHigh}</option>
+          <option value={3}>{t.exportResMax}</option>
         </select>
       </label>
       <button
@@ -63,9 +65,9 @@ export function ExportPanel({ disabled, width, height, onExport }: ExportPanelPr
           }
         }}
       >
-        {busy ? "Preparing…" : "Download collage"}
+        {busy ? t.exportButtonBusy : t.exportButton}
       </button>
-      {disabled && <p className="field-hint">Upload at least one image to enable export.</p>}
+      {disabled && <p className="field-hint">{t.exportDisabledHint}</p>}
     </div>
   );
 }
