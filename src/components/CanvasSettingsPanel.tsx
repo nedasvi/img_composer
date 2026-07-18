@@ -61,9 +61,12 @@ export function CanvasSettingsPanel({
             min={64}
             max={8000}
             value={Math.round(settings.width)}
-            disabled={settings.aspect !== "custom"}
             onChange={(e) =>
-              onChange({ ...settings, width: Number(e.target.value) || settings.width })
+              onChange({
+                ...settings,
+                aspect: "custom",
+                width: Number(e.target.value) || settings.width,
+              })
             }
           />
         </label>
@@ -74,13 +77,17 @@ export function CanvasSettingsPanel({
             min={64}
             max={8000}
             value={Math.round(settings.height)}
-            disabled={settings.aspect !== "custom"}
             onChange={(e) =>
-              onChange({ ...settings, height: Number(e.target.value) || settings.height })
+              onChange({
+                ...settings,
+                aspect: "custom",
+                height: Number(e.target.value) || settings.height,
+              })
             }
           />
         </label>
       </div>
+      <p className="field-hint">{t.canvasSizeHint}</p>
       <label className="field field--inline">
         <span>{t.canvasTransparentLabel}</span>
         <input

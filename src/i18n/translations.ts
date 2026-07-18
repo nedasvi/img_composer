@@ -33,6 +33,7 @@ export interface Dictionary {
   aspectCustom: string;
   canvasWidthLabel: string;
   canvasHeightLabel: string;
+  canvasSizeHint: string;
   canvasTransparentLabel: string;
   canvasBackgroundColorLabel: string;
 
@@ -119,6 +120,7 @@ export const dictionaries: Record<Lang, Dictionary> = {
     aspectCustom: "Custom size",
     canvasWidthLabel: "Width (pixels)",
     canvasHeightLabel: "Height (pixels)",
+    canvasSizeHint: "Type a size to use it exactly — this switches Shape to “Custom size.”",
     canvasTransparentLabel: "See-through background",
     canvasBackgroundColorLabel: "Background color",
 
@@ -203,6 +205,7 @@ export const dictionaries: Record<Lang, Dictionary> = {
     aspectCustom: "Свой размер",
     canvasWidthLabel: "Ширина (пикселей)",
     canvasHeightLabel: "Высота (пикселей)",
+    canvasSizeHint: "Введите точный размер — «Форма» переключится на «Свой размер».",
     canvasTransparentLabel: "Прозрачный фон",
     canvasBackgroundColorLabel: "Цвет фона",
 
