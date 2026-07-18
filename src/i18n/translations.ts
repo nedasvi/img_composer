@@ -85,6 +85,11 @@ export interface Dictionary {
   exportDisabledHint: string;
 
   languageLabel: string;
+
+  zoomOut: string;
+  zoomIn: string;
+  zoomReset: string;
+  zoomLevel: (percent: number) => string;
 }
 
 export const dictionaries: Record<Lang, Dictionary> = {
@@ -173,6 +178,11 @@ export const dictionaries: Record<Lang, Dictionary> = {
     exportDisabledHint: "Add at least one photo to save your collage.",
 
     languageLabel: "Language",
+
+    zoomOut: "Zoom out",
+    zoomIn: "Zoom in",
+    zoomReset: "Reset zoom to fit",
+    zoomLevel: (percent) => `Zoom ${percent}%`,
   },
   ru: {
     appTitle: "Конструктор коллажей",
@@ -258,6 +268,11 @@ export const dictionaries: Record<Lang, Dictionary> = {
     exportDisabledHint: "Добавьте хотя бы одно фото, чтобы сохранить коллаж.",
 
     languageLabel: "Язык",
+
+    zoomOut: "Уменьшить",
+    zoomIn: "Увеличить",
+    zoomReset: "Сбросить масштаб",
+    zoomLevel: (percent) => `Масштаб ${percent}%`,
   },
 };
 

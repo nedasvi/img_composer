@@ -1,8 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { CanvasSettings, ComposerImage, GridSettings, LayoutMode, Transform } from "../types";
 import { drawComposition } from "../utils/canvasDraw";
 import { isInsideTransform, isNearResizeHandle } from "../utils/hitTest";
 import { computeGridCells } from "../utils/layout";
+
+const STAGE_PADDING = 32; // must match .canvas-stage padding (16px * 2) in App.css
 
 interface CollageCanvasProps {
   images: ComposerImage[];
@@ -10,6 +12,7 @@ interface CollageCanvasProps {
   layoutMode: LayoutMode;
   grid: GridSettings;
   selectedId: string | null;
+  zoom: number;
   onSelect: (id: string | null) => void;
   onInteractionStart: (id: string) => void;
   onTransformChange: (id: string, transform: Transform) => void;
@@ -30,12 +33,33 @@ export function CollageCanvas({
   layoutMode,
   grid,
   selectedId,
+  zoom,
   onSelect,
   onInteractionStart,
   onTransformChange,
 }: CollageCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dragRef = useRef<DragState | null>(null);
+  const [fitScale, setFitScale] = useState(1);
+
+  useLayoutEffect(() => {
+    const stage = canvasRef.current?.parentElement;
+    if (!stage) return;
+
+    function recompute() {
+      if (!stage) return;
+      const availW = stage.clientWidth - STAGE_PADDING;
+      const availH = stage.clientHeight - STAGE_PADDING;
+      if (availW <= 0 || availH <= 0) return;
+      const scale = Math.min(availW / settings.width, availH / settings.height);
+      setFitScale(scale > 0 ? scale : 1);
+    }
+
+    recompute();
+    const observer = new ResizeObserver(recompute);
+    observer.observe(stage);
+    return () => observer.disconnect();
+  }, [settings.width, settings.height]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -164,11 +188,14 @@ export function CollageCanvas({
     }
   }
 
+  const displayScale = fitScale * zoom;
+
   return (
     <canvas
       ref={canvasRef}
       width={settings.width}
       height={settings.height}
+      style={{ width: settings.width * displayScale, height: settings.height * displayScale }}
       className="collage-canvas collage-canvas--interactive"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}

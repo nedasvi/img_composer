@@ -7,6 +7,7 @@ import { LayoutPanel } from "./components/LayoutPanel";
 import { SelectedImagePanel } from "./components/SelectedImagePanel";
 import { ExportPanel } from "./components/ExportPanel";
 import { CollageCanvas } from "./components/CollageCanvas";
+import { ZoomControls } from "./components/ZoomControls";
 import { LanguageSwitcher } from "./components/LanguageSwitcher";
 import { useLanguage } from "./i18n/LanguageContext";
 import {
@@ -41,6 +42,7 @@ function App() {
   const [canvasSettings, setCanvasSettings] = useState<CanvasSettings>(DEFAULT_CANVAS);
   const [gridSettings, setGridSettings] = useState<GridSettings>(DEFAULT_GRID);
   const [tiltEnabled, setTiltEnabled] = useState(false);
+  const [canvasZoom, setCanvasZoom] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [failedUploads, setFailedUploads] = useState<string[]>([]);
 
@@ -271,14 +273,18 @@ function App() {
                 layoutMode={layoutMode}
                 grid={gridSettings}
                 selectedId={selectedId}
+                zoom={canvasZoom}
                 onSelect={setSelectedId}
                 onInteractionStart={handleInteractionStart}
                 onTransformChange={updateTransform}
               />
             </div>
-            <p className="canvas-stage__dims">
-              {Math.round(canvasSettings.width)} × {Math.round(canvasSettings.height)}px
-            </p>
+            <div className="canvas-stage__toolbar">
+              <p className="canvas-stage__dims">
+                {Math.round(canvasSettings.width)} × {Math.round(canvasSettings.height)}px
+              </p>
+              <ZoomControls zoom={canvasZoom} onChange={setCanvasZoom} />
+            </div>
           </div>
 
           <aside className="editor__sidebar">
